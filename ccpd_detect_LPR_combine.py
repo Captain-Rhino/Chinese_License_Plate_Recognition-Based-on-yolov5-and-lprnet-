@@ -36,7 +36,7 @@ import sys
 from pathlib import Path
 
 import torch
-
+output_labels = []
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -224,7 +224,9 @@ def run(
                         crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
                         #返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
                         predicted_labels = lpr.predict(crop_return)
-                        print(predicted_labels)
+                        #print(predicted_labels)
+                        output_labels.append(predicted_labels)
+            #print(output_labels)
             # Stream results
             im0 = annotator.result()
             if view_img:
@@ -256,7 +258,19 @@ def run(
 
         # Print time (inference-only)
         LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
+    #print(output_labels)
+    #保存车牌信息
+    csv_file = 'data/CRPD_TEST/recognized_plates.csv'
+    with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:
+        writer = csv.writer(f)
+        # 写入标题行（如果有需要）
+        # writer.writerow(['Plate'])
+        # 写入数据行
+        for plate in output_labels:
+            writer.writerow([plate[0]])
+            #writer.writerow(['',plate])
 
+    print("CSV文件已成功生成:", csv_file)
     # Print results
     t = tuple(x.t / seen * 1e3 for x in dt)  # speeds per image
     LOGGER.info(f"Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}" % t)
@@ -270,14 +284,14 @@ def run(
 def parse_opt():
     """Parses command-line arguments for YOLOv5 detection, setting inference options and model configurations."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "half_ccpd.pt", help="model path or triton URL")
-    parser.add_argument("--source", type=str, default=ROOT / "data/chuanA_test", help="file/dir/URL/glob/screen/0(webcam)")
+    parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "ccpd_chose_100epoch.pt", help="model path or triton URL")
+    parser.add_argument("--source", type=str, default=ROOT / "data/CRPD_100_TEST", help="file/dir/URL/glob/screen/0(webcam)")
     parser.add_argument("--data", type=str, default=ROOT / "data/ccpd.yaml", help="(optional) dataset.yaml path")
     parser.add_argument("--imgsz", "--img", "--img-size", nargs="+", type=int, default=[640], help="inference size h,w")
     parser.add_argument("--conf-thres", type=float, default=0.25, help="confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.45, help="NMS IoU threshold")
     parser.add_argument("--max-det", type=int, default=1000, help="maximum detections per image")
-    parser.add_argument("--device", default="", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
+    parser.add_argument("--device", default="0", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
     parser.add_argument("--view-img", action="store_true", help="show results")
     parser.add_argument("--save-txt", action="store_true", help="save results to *.txt")
     parser.add_argument("--save-csv", action="store_true", help="save results in CSV format")
