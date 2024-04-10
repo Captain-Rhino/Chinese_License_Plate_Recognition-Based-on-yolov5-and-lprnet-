@@ -4,11 +4,11 @@ import csv
 Plate = []
 
 # 获取 labels 文件夹中的所有文件
-label_files = os.listdir('data/CRPD_TEST/labels')
+label_files = os.listdir('data/CRPD_1000/labels')
 
 # 对每个文件执行操作
 for file_name in label_files:
-    file_path = os.path.join('data/CRPD_TEST/labels', file_name)
+    file_path = os.path.join('data/CRPD_1000/labels', file_name)
     
     # 读取标注数据文件
     with open(file_path, 'r') as f:
@@ -23,7 +23,7 @@ print(Plate)#打印车牌
 
 
 # 指定要保存的CSV文件路径
-csv_file = 'data/CRPD_TEST/plates.csv'
+csv_file = 'data/CRPD_1000/plates.csv'
 
 # 将Plate列表数据写入CSV文件
 with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:

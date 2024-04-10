@@ -77,7 +77,7 @@ def run(
     max_det=1000,  # maximum detections per image
     device="",  # cuda device, i.e. 0 or 0,1,2,3 or cpu
     view_img=False,  # show results
-    save_txt=False,  # save results to *.txt
+    save_txt=False,  # save results to *.txt #
     save_csv=False,  # save results in CSV format
     save_conf=False,  # save confidences in --save-txt labels
     save_crop=False,  # save cropped prediction boxes
@@ -199,13 +199,24 @@ def run(
                     n = (det[:, 5] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
+
+                #find max confidence
+                MaxConf = []
+                for i in range(len(det)):
+                    # print(i)
+                    MaxConf.append(det[i][4])
+                Max = max(MaxConf)
+                # 最大值
+                MaxI = MaxConf.index(Max)
+                det = det[[MaxI]]
+
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
                     label = names[c] if hide_conf else f"{names[c]}"
                     confidence = float(conf)
                     confidence_str = f"{confidence:.2f}"
-
+                    #print(confidence_str)
                     if save_csv:
                         write_to_csv(p.name, label, confidence_str)
 
@@ -268,18 +279,18 @@ def parse_opt():
     """Parses command-line arguments for YOLOv5 detection, setting inference options and model configurations."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "new_ccpd_chose.pt", help="model path or triton URL")
-    parser.add_argument("--source", type=str, default=ROOT / "data/clpd_2024", help="file/dir/URL/glob/screen/0(webcam)")
+    parser.add_argument("--source", type=str, default=ROOT / "data/mid_term/exp_midterm", help="file/dir/URL/glob/screen/0(webcam)")
     parser.add_argument("--data", type=str, default=ROOT / "data/ccpd.yaml", help="(optional) dataset.yaml path")
     parser.add_argument("--imgsz", "--img", "--img-size", nargs="+", type=int, default=[640], help="inference size h,w")
-    parser.add_argument("--conf-thres", type=float, default=0.25, help="confidence threshold")
+    parser.add_argument("--conf-thres", type=float, default=0.3, help="confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.45, help="NMS IoU threshold")
     parser.add_argument("--max-det", type=int, default=1000, help="maximum detections per image")
     parser.add_argument("--device", default="", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
     parser.add_argument("--view-img", action="store_true", help="show results")
     parser.add_argument("--save-txt", action="store_true", help="save results to *.txt")
-    parser.add_argument("--save-csv", action="store_true", help="save results in CSV format")
+    parser.add_argument("--save-csv", action="store_false", help="save results in CSV format")
     parser.add_argument("--save-conf", action="store_true", help="save confidences in --save-txt labels")
-    parser.add_argument("--save-crop", action="store_true", help="save cropped prediction boxes")
+    parser.add_argument("--save-crop", action="store_false", help="save cropped prediction boxes")
     parser.add_argument("--nosave", action="store_true", help="do not save images/videos")
     parser.add_argument("--classes", nargs="+", type=int, help="filter by class: --classes 0, or --classes 0 2 3")
     parser.add_argument("--agnostic-nms", action="store_true", help="class-agnostic NMS")
