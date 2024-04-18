@@ -262,7 +262,8 @@ def run(
                             licence_color = "黄"
                         ##
                         predicted_labels = lpr.predict(crop_return)
-                        print(predicted_labels + "_" + licence_color)
+                        predicted_labels_str = "".join(predicted_labels)
+                        print(predicted_labels_str + "_" + licence_color)
                         output_labels.append(predicted_labels)
 
 
