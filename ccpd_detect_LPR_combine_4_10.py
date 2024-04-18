@@ -30,6 +30,7 @@ Usage - formats:
 
 import argparse
 import csv
+import numpy
 import os
 import platform
 import sys
@@ -233,10 +234,35 @@ def run(
                         annotator.box_label(xyxy, label, color=colors(c, True))
 
                     if save_crop:
-                        crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
-                        #返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
+                        R_means = []
+                        G_means = []
+                        B_means = []
+                        crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg",
+                                                   BGR=True)
+                        # 返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
+                        ##
+                        im_B = crop_return[:, :, 0]
+                        im_G = crop_return[:, :, 1]
+                        im_R = crop_return[:, :, 2]
+                        # count mean for every channel
+                        im_R_mean = numpy.mean(im_R)
+                        im_G_mean = numpy.mean(im_G)
+                        im_B_mean = numpy.mean(im_B)
+                        # save single mean value to a set of means
+                        R_means.append(im_R_mean)
+                        G_means.append(im_G_mean)
+                        B_means.append(im_B_mean)
+                        # print('图片 的 RGB平均值为 \n[{}，{}，{}]'.format(im_R_mean, im_G_mean, im_B_mean))
+
+                        if (im_B_mean > im_G_mean and im_B_mean > im_R_mean):
+                            licence_color = "蓝"
+                        elif (im_G_mean > im_B_mean and im_G_mean > im_R_mean):
+                            licence_color = "绿"
+                        else:
+                            licence_color = "黄"
+                        ##
                         predicted_labels = lpr.predict(crop_return)
-                        print(predicted_labels)
+                        print(predicted_labels + "_" + licence_color)
                         output_labels.append(predicted_labels)
 
 
