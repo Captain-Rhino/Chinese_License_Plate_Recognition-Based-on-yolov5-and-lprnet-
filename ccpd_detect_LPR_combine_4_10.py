@@ -37,6 +37,7 @@ from pathlib import Path
 
 import torch
 output_labels = []
+#predicted_labels = 0
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # YOLOv5 root directory
 if str(ROOT) not in sys.path:
@@ -200,6 +201,16 @@ def run(
                     n = (det[:, 5] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
+                #find max confidence
+                MaxConf = []
+                for i in range(len(det)):
+                    # print(i)
+                    MaxConf.append(det[i][4])
+                Max = max(MaxConf)
+                # 最大值
+                MaxI = MaxConf.index(Max)
+                det = det[[MaxI]]
+
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
                     c = int(cls)  # integer class
@@ -220,12 +231,15 @@ def run(
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f"{names[c]} {conf:.2f}")
                         annotator.box_label(xyxy, label, color=colors(c, True))
+
                     if save_crop:
                         crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg", BGR=True)
                         #返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
                         predicted_labels = lpr.predict(crop_return)
                         print(predicted_labels)
                         output_labels.append(predicted_labels)
+
+
             #print(output_labels)
             # Stream results
             im0 = annotator.result()
@@ -259,17 +273,16 @@ def run(
         # Print time (inference-only)
         LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
     #print(output_labels)
+
     #保存车牌信息
-    csv_file = 'data/CRPD_TEST/recognized_plates_clpd2024.csv'
+    csv_file = 'data/CRPD_1000/recognized_plates.csv'#保存路径
     with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:
         writer = csv.writer(f)
-        # 写入标题行（如果有需要）
         # writer.writerow(['Plate'])
         # 写入数据行
         for plate in output_labels:
             writer.writerow([plate[0]])
             #writer.writerow(['',plate])
-
     print("CSV文件已成功生成:", csv_file)
     # Print results
     t = tuple(x.t / seen * 1e3 for x in dt)  # speeds per image
@@ -284,11 +297,11 @@ def run(
 def parse_opt():
     """Parses command-line arguments for YOLOv5 detection, setting inference options and model configurations."""
     parser = argparse.ArgumentParser()
-    parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "chose_1600.pt", help="model path or triton URL")
-    parser.add_argument("--source", type=str, default=ROOT / "data/CRPD_100_TEST", help="file/dir/URL/glob/screen/0(webcam)")
+    parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "new_ccpd_chose.pt", help="model path or triton URL")
+    parser.add_argument("--source", type=str, default=ROOT / "data/CRPD_1000/images", help="file/dir/URL/glob/screen/0(webcam)")
     parser.add_argument("--data", type=str, default=ROOT / "data/ccpd.yaml", help="(optional) dataset.yaml path")
     parser.add_argument("--imgsz", "--img", "--img-size", nargs="+", type=int, default=[640], help="inference size h,w")
-    parser.add_argument("--conf-thres", type=float, default=0.25, help="confidence threshold")
+    parser.add_argument("--conf-thres", type=float, default=0.33, help="confidence threshold")
     parser.add_argument("--iou-thres", type=float, default=0.45, help="NMS IoU threshold")
     parser.add_argument("--max-det", type=int, default=1000, help="maximum detections per image")
     parser.add_argument("--device", default="0", help="cuda device, i.e. 0 or 0,1,2,3 or cpu")
