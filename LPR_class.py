@@ -10,8 +10,8 @@ class LicensePlateRecognizer:
                       '桂', '琼', '川', '贵', '云', '藏', '陕', '甘', '青', '宁',
                       '新', '港', '澳', '警', '挂', '使', '领', '学',
                       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K',
-                      'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V',
+                      'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H','I', 'J', 'K',
+                      'L', 'M', 'N', 'O','P', 'Q', 'R', 'S', 'T', 'U', 'V',
                       'W', 'X', 'Y', 'Z', '-'
                      ]
         self.model = build_lprnet(lpr_max_len=8, class_num=len(self.CHARS), dropout_rate=0.5)  # Build model

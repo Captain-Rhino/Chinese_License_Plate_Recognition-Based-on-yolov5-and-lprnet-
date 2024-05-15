@@ -202,7 +202,7 @@ def run(
                     n = (det[:, 5] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
 
-                #find max confidence
+                #find max confidence ---begin---
                 MaxConf = []
                 for i in range(len(det)):
                     # print(i)
@@ -211,6 +211,7 @@ def run(
                 # 最大值
                 MaxI = MaxConf.index(Max)
                 det = det[[MaxI]]
+                #find max confidence ---end---
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -228,43 +229,80 @@ def run(
                         with open(f"{txt_path}.txt", "a") as f:
                             f.write(("%g " * len(line)).rstrip() % line + "\n")
 
-                    if save_img or save_crop or view_img:  # Add bbox to image
-                        c = int(cls)  # integer class
-                        label = None if hide_labels else (names[c] if hide_conf else f"{names[c]} {conf:.2f}")
-                        annotator.box_label(xyxy, label, color=colors(c, True))
-
                     if save_crop:
-                        R_means = []
-                        G_means = []
-                        B_means = []
+                            # 判定颜色 起始
+                            #         R_means = []
+                            #        G_means = []
+                            #        B_means = []
                         crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg",
                                                    BGR=True)
-                        # 返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
-                        ##
-                        im_B = crop_return[:, :, 0]
-                        im_G = crop_return[:, :, 1]
-                        im_R = crop_return[:, :, 2]
-                        # count mean for every channel
-                        im_R_mean = numpy.mean(im_R)
-                        im_G_mean = numpy.mean(im_G)
-                        im_B_mean = numpy.mean(im_B)
-                        # save single mean value to a set of means
-                        R_means.append(im_R_mean)
-                        G_means.append(im_G_mean)
-                        B_means.append(im_B_mean)
-                        # print('图片 的 RGB平均值为 \n[{}，{}，{}]'.format(im_R_mean, im_G_mean, im_B_mean))
+                            # 返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
+                            ##
+                            #           im_B = crop_return[:, :, 0]
+                            #         im_G = crop_return[:, :, 1]
+                            #   im_R = crop_return[:, :, 2]
+                            # count mean for every channel
+                            #    im_R_mean = numpy.mean(im_R)
+                            #  im_G_mean = numpy.mean(im_G)
+                            #   im_B_mean = numpy.mean(im_B)
+                            # save single mean value to a set of means
+                            #      R_means.append(im_R_mean)
+                            #     G_means.append(im_G_mean)
+                            #     B_means.append(im_B_mean)
+                            # print('图片 的 RGB平均值为 \n[{}，{}，{}]'.format(im_R_mean, im_G_mean, im_B_mean))
 
-                        if (im_B_mean > im_G_mean and im_B_mean > im_R_mean):
-                            licence_color = "蓝"
-                        elif (im_G_mean > im_B_mean and im_G_mean > im_R_mean):
-                            licence_color = "绿"
-                        else:
-                            licence_color = "黄"
-                        ##
+                            #    if (im_B_mean > im_G_mean and im_B_mean > im_R_mean):
+                            #      licence_color = "蓝"
+                            #   elif (im_G_mean > im_B_mean and im_G_mean > im_R_mean):
+                            #     licence_color = "绿"
+                            #  else:
+                            #    licence_color = "黄"
+                            ###判定颜色 终止
                         predicted_labels = lpr.predict(crop_return)
                         predicted_labels_str = "".join(predicted_labels)
-                        print(predicted_labels_str + "_" + licence_color)
+                        print(predicted_labels_str)  # + "_" + licence_color)
                         output_labels.append(predicted_labels)
+
+                    if save_img or view_img:  # Add bbox to image
+                        c = int(cls)  # integer class
+                        label = None if hide_labels else (names[c] if hide_conf else f"{predicted_labels_str} {conf:.2f}")
+                        annotator.box_label(xyxy, label, color=colors(c, True))
+                        #befor change
+                        #annotator.box_label(xyxy, label, color=colors(c, True))
+
+             #        if save_crop:
+             #            #判定颜色 起始
+             #   #         R_means = []
+             #    #        G_means = []
+             #    #        B_means = []
+             #            crop_return = save_one_box(xyxy, imc, file=save_dir / "crops" / names[c] / f"{p.stem}.jpg",
+             #                                       BGR=True)
+             #            # 返回一个带有图像数据的NumPy数组类似（100，200，3）长，宽，图像通道个数
+             #            ##
+             # #           im_B = crop_return[:, :, 0]
+             #   #         im_G = crop_return[:, :, 1]
+             #         #   im_R = crop_return[:, :, 2]
+             #            # count mean for every channel
+             #        #    im_R_mean = numpy.mean(im_R)
+             #          #  im_G_mean = numpy.mean(im_G)
+             #         #   im_B_mean = numpy.mean(im_B)
+             #            # save single mean value to a set of means
+             #      #      R_means.append(im_R_mean)
+             #       #     G_means.append(im_G_mean)
+             #       #     B_means.append(im_B_mean)
+             #            # print('图片 的 RGB平均值为 \n[{}，{}，{}]'.format(im_R_mean, im_G_mean, im_B_mean))
+             #
+             #        #    if (im_B_mean > im_G_mean and im_B_mean > im_R_mean):
+             #          #      licence_color = "蓝"
+             #         #   elif (im_G_mean > im_B_mean and im_G_mean > im_R_mean):
+             #           #     licence_color = "绿"
+             #          #  else:
+             #            #    licence_color = "黄"
+             #            ###判定颜色 终止
+             #            predicted_labels = lpr.predict(crop_return)
+             #            predicted_labels_str = "".join(predicted_labels)
+             #            print(predicted_labels_str )#+ "_" + licence_color)
+             #            output_labels.append(predicted_labels)
 
 
             #print(output_labels)
@@ -325,7 +363,7 @@ def parse_opt():
     """Parses command-line arguments for YOLOv5 detection, setting inference options and model configurations."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "new_ccpd_chose.pt", help="model path or triton URL")
-    parser.add_argument("--source", type=str, default=ROOT / "data/CRPD_1000/images", help="file/dir/URL/glob/screen/0(webcam)")
+    parser.add_argument("--source", type=str, default=ROOT / "data/clpd2024", help="file/dir/URL/glob/screen/0(webcam)")
     parser.add_argument("--data", type=str, default=ROOT / "data/ccpd.yaml", help="(optional) dataset.yaml path")
     parser.add_argument("--imgsz", "--img", "--img-size", nargs="+", type=int, default=[640], help="inference size h,w")
     parser.add_argument("--conf-thres", type=float, default=0.33, help="confidence threshold")
