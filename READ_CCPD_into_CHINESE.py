@@ -5,7 +5,7 @@ import numpy as np
 
 from PIL import Image
 # CCPD车牌有重复，应该是不同角度或者模糊程度
-path = r'G:\yolo-train\lpr_dataset\ccpd_tilt'  # 改成自己的车牌路径
+path = r'G:\yolo-train\lpr_dataset\test'  # 改成自己的车牌路径
 
 
 provinces = ["皖", "沪", "津", "渝", "冀", "晋", "蒙", "辽", "吉", "黑", "苏", "浙", "京", "闽", "赣", "鲁", "豫", "鄂", "湘", "粤", "桂", "琼", "川", "贵", "云", "藏", "陕", "甘", "青", "宁", "新", "警", "学", "O"]
@@ -46,7 +46,7 @@ for filename in os.listdir(path):
     # img = img.resize((94, 24), Image.LANCZOS)
     # img = np.asarray(img)  # 转成array,变成24*94*3
     print(result)
-    cv2.imencode('.jpg', img)[1].tofile(r"G:\yolo-train\lpr_dataset\my_ccpd_tilt\{}.jpg".format(result))
+    #cv2.imencode('.jpg', img)[1].tofile(r"G:\yolo-train\lpr_dataset\save_test\{}.jpg".format(result))
     # 图片中文名会报错
     # cv2.imwrite(r"K:\MyProject\datasets\ccpd\new\ccpd_2020\rec_images\train\{}.jpg".format(result), img)  # 改成自己存放的路径
-print("共生成{}张".format(num))
+#print("共生成{}张".format(num))
