@@ -59,13 +59,26 @@
     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:18pt;&quot;&gt;车牌检测系统&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
-  <widget class="QTextEdit" name="textEdit">
+  <widget class="QPushButton" name="Exit_Button">
    <property name="geometry">
     <rect>
-     <x>80</x>
-     <y>530</y>
-     <width>471</width>
-     <height>87</height>
+     <x>770</x>
+     <y>540</y>
+     <width>141</width>
+     <height>61</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>结束进程</string>
+   </property>
+  </widget>
+  <widget class="QTextBrowser" name="textBrowser">
+   <property name="geometry">
+    <rect>
+     <x>50</x>
+     <y>520</y>
+     <width>531</width>
+     <height>81</height>
     </rect>
    </property>
    <property name="html">

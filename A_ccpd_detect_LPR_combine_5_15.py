@@ -340,22 +340,22 @@ def run(
                     vid_writer[i].write(im0)
 
         # Print time (inference-only)
-        LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
+       # LOGGER.info(f"{s}{'' if len(det) else '(no detections), '}{dt[1].dt * 1E3:.1f}ms")
     #print(output_labels)
 
     #保存车牌信息
-    csv_file = 'data/CCPD_CSV/recognized_plates.csv'#保存路径
-    with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:
-        writer = csv.writer(f)
-        # writer.writerow(['Plate'])
-        # 写入数据行
-        for plate in output_labels:
-            writer.writerow([plate])
-            #writer.writerow(['',plate])
-    print("CSV文件已成功生成:", csv_file)
+    # csv_file = 'data/CCPD_CSV/recognized_plates.csv'#保存路径
+    # with open(csv_file, 'w', newline='', encoding='utf-8-sig') as f:
+    #     writer = csv.writer(f)
+    #     # writer.writerow(['Plate'])
+    #     # 写入数据行
+    #     for plate in output_labels:
+    #         writer.writerow([plate])
+    #         #writer.writerow(['',plate])
+    # # print("CSV文件已成功生成:", csv_file)
     # Print results
     t = tuple(x.t / seen * 1e3 for x in dt)  # speeds per image
-    LOGGER.info(f"Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}" % t)
+    #LOGGER.info(f"Speed: %.1fms pre-process, %.1fms inference, %.1fms NMS per image at shape {(1, 3, *imgsz)}" % t)
     if save_txt or save_img:
         s = f"\n{len(list(save_dir.glob('labels/*.txt')))} labels saved to {save_dir / 'labels'}" if save_txt else ""
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}{s}")
@@ -367,7 +367,7 @@ def parse_opt():
     """Parses command-line arguments for YOLOv5 detection, setting inference options and model configurations."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--weights", nargs="+", type=str, default=ROOT / "new_ccpd_chose.pt", help="model path or triton URL")
-    parser.add_argument("--source", type=str, default=ROOT / "data/ccpd_weather", help="file/dir/URL/glob/screen/0(webcam)")
+    parser.add_argument("--source", type=str, default=ROOT / "data/test_data", help="file/dir/URL/glob/screen/0(webcam)")
     parser.add_argument("--data", type=str, default=ROOT / "data/ccpd.yaml", help="(optional) dataset.yaml path")
     parser.add_argument("--imgsz", "--img", "--img-size", nargs="+", type=int, default=[640], help="inference size h,w")
     parser.add_argument("--conf-thres", type=float, default=0.33, help="confidence threshold")
@@ -396,7 +396,7 @@ def parse_opt():
     parser.add_argument("--vid-stride", type=int, default=1, help="video frame-rate stride")
     opt = parser.parse_args()
     opt.imgsz *= 2 if len(opt.imgsz) == 1 else 1  # expand
-    print_args(vars(opt))
+    #print_args(vars(opt))
     return opt
 
 
