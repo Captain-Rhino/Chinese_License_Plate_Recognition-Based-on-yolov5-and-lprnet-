@@ -178,15 +178,15 @@ class BaseModel(nn.Module):
         for _ in range(10):
             m(x.copy() if c else x)
         dt.append((time_sync() - t) * 100)
-        if m == self.model[0]:
-            LOGGER.info(f"{'time (ms)':>10s} {'GFLOPs':>10s} {'params':>10s}  module")
-        LOGGER.info(f"{dt[-1]:10.2f} {o:10.2f} {m.np:10.0f}  {m.type}")
-        if c:
-            LOGGER.info(f"{sum(dt):10.2f} {'-':>10s} {'-':>10s}  Total")
+        #if m == self.model[0]:
+            #LOGGER.info(f"{'time (ms)':>10s} {'GFLOPs':>10s} {'params':>10s}  module")
+        #LOGGER.info(f"{dt[-1]:10.2f} {o:10.2f} {m.np:10.0f}  {m.type}")
+        #if c:
+            #LOGGER.info(f"{sum(dt):10.2f} {'-':>10s} {'-':>10s}  Total")
 
     def fuse(self):
         """Fuses Conv2d() and BatchNorm2d() layers in the model to improve inference speed."""
-        LOGGER.info("Fusing layers... ")
+        #LOGGER.info("Fusing layers... ")
         for m in self.model.modules():
             if isinstance(m, (Conv, DWConv)) and hasattr(m, "bn"):
                 m.conv = fuse_conv_and_bn(m.conv, m.bn)  # update conv

@@ -470,7 +470,7 @@ class DetectMultiBackend(nn.Module):
             model.half() if fp16 else model.float()
             self.model = model  # explicitly assign for to(), cpu(), cuda(), half()
         elif jit:  # TorchScript
-            LOGGER.info(f"Loading {w} for TorchScript inference...")
+           # LOGGER.info(f"Loading {w} for TorchScript inference...")
             extra_files = {"config.txt": ""}  # model metadata
             model = torch.jit.load(w, _extra_files=extra_files, map_location=device)
             model.half() if fp16 else model.float()
@@ -481,11 +481,11 @@ class DetectMultiBackend(nn.Module):
                 )
                 stride, names = int(d["stride"]), d["names"]
         elif dnn:  # ONNX OpenCV DNN
-            LOGGER.info(f"Loading {w} for ONNX OpenCV DNN inference...")
+            #LOGGER.info(f"Loading {w} for ONNX OpenCV DNN inference...")
             check_requirements("opencv-python>=4.5.4")
             net = cv2.dnn.readNetFromONNX(w)
         elif onnx:  # ONNX Runtime
-            LOGGER.info(f"Loading {w} for ONNX Runtime inference...")
+            #LOGGER.info(f"Loading {w} for ONNX Runtime inference...")
             check_requirements(("onnx", "onnxruntime-gpu" if cuda else "onnxruntime"))
             import onnxruntime
 
@@ -496,7 +496,7 @@ class DetectMultiBackend(nn.Module):
             if "stride" in meta:
                 stride, names = int(meta["stride"]), eval(meta["names"])
         elif xml:  # OpenVINO
-            LOGGER.info(f"Loading {w} for OpenVINO inference...")
+            #LOGGER.info(f"Loading {w} for OpenVINO inference...")
             check_requirements("openvino>=2023.0")  # requires openvino-dev: https://pypi.org/project/openvino-dev/
             from openvino.runtime import Core, Layout, get_batch
 
@@ -512,7 +512,7 @@ class DetectMultiBackend(nn.Module):
             ov_compiled_model = core.compile_model(ov_model, device_name="AUTO")  # AUTO selects best available device
             stride, names = self._load_metadata(Path(w).with_suffix(".yaml"))  # load metadata
         elif engine:  # TensorRT
-            LOGGER.info(f"Loading {w} for TensorRT inference...")
+            #LOGGER.info(f"Loading {w} for TensorRT inference...")
             import tensorrt as trt  # https://developer.nvidia.com/nvidia-tensorrt-download
 
             check_version(trt.__version__, "7.0.0", hard=True)  # require tensorrt>=7.0.0
@@ -544,18 +544,18 @@ class DetectMultiBackend(nn.Module):
             binding_addrs = OrderedDict((n, d.ptr) for n, d in bindings.items())
             batch_size = bindings["images"].shape[0]  # if dynamic, this is instead max batch size
         elif coreml:  # CoreML
-            LOGGER.info(f"Loading {w} for CoreML inference...")
+           # LOGGER.info(f"Loading {w} for CoreML inference...")
             import coremltools as ct
 
             model = ct.models.MLModel(w)
         elif saved_model:  # TF SavedModel
-            LOGGER.info(f"Loading {w} for TensorFlow SavedModel inference...")
+            #LOGGER.info(f"Loading {w} for TensorFlow SavedModel inference...")
             import tensorflow as tf
 
             keras = False  # assume TF1 saved_model
             model = tf.keras.models.load_model(w) if keras else tf.saved_model.load(w)
         elif pb:  # GraphDef https://www.tensorflow.org/guide/migrate#a_graphpb_or_graphpbtxt
-            LOGGER.info(f"Loading {w} for TensorFlow GraphDef inference...")
+            #LOGGER.info(f"Loading {w} for TensorFlow GraphDef inference...")
             import tensorflow as tf
 
             def wrap_frozen_graph(gd, inputs, outputs):
@@ -587,13 +587,13 @@ class DetectMultiBackend(nn.Module):
                     tf.lite.experimental.load_delegate,
                 )
             if edgetpu:  # TF Edge TPU https://coral.ai/software/#edgetpu-runtime
-                LOGGER.info(f"Loading {w} for TensorFlow Lite Edge TPU inference...")
+                #LOGGER.info(f"Loading {w} for TensorFlow Lite Edge TPU inference...")
                 delegate = {"Linux": "libedgetpu.so.1", "Darwin": "libedgetpu.1.dylib", "Windows": "edgetpu.dll"}[
                     platform.system()
                 ]
                 interpreter = Interpreter(model_path=w, experimental_delegates=[load_delegate(delegate)])
             else:  # TFLite
-                LOGGER.info(f"Loading {w} for TensorFlow Lite inference...")
+                #LOGGER.info(f"Loading {w} for TensorFlow Lite inference...")
                 interpreter = Interpreter(model_path=w)  # load TFLite model
             interpreter.allocate_tensors()  # allocate
             input_details = interpreter.get_input_details()  # inputs
@@ -607,7 +607,7 @@ class DetectMultiBackend(nn.Module):
         elif tfjs:  # TF.js
             raise NotImplementedError("ERROR: YOLOv5 TF.js inference is not supported")
         elif paddle:  # PaddlePaddle
-            LOGGER.info(f"Loading {w} for PaddlePaddle inference...")
+            #LOGGER.info(f"Loading {w} for PaddlePaddle inference...")
             check_requirements("paddlepaddle-gpu" if cuda else "paddlepaddle")
             import paddle.inference as pdi
 
@@ -621,7 +621,7 @@ class DetectMultiBackend(nn.Module):
             input_handle = predictor.get_input_handle(predictor.get_input_names()[0])
             output_names = predictor.get_output_names()
         elif triton:  # NVIDIA Triton Inference Server
-            LOGGER.info(f"Using {w} as Triton Inference Server...")
+           # LOGGER.info(f"Using {w} as Triton Inference Server...")
             check_requirements("tritonclient[all]")
             from utils.triton import TritonRemoteModel
 
@@ -774,8 +774,8 @@ class AutoShape(nn.Module):
     def __init__(self, model, verbose=True):
         """Initializes YOLOv5 model for inference, setting up attributes and preparing model for evaluation."""
         super().__init__()
-        if verbose:
-            LOGGER.info("Adding AutoShape... ")
+        #if verbose:
+            #LOGGER.info("Adding AutoShape... ")
         copy_attr(self, model, include=("yaml", "nc", "hyp", "names", "stride", "abc"), exclude=())  # copy attributes
         self.dmb = isinstance(model, DetectMultiBackend)  # DetectMultiBackend() instance
         self.pt = not self.dmb or model.pt  # PyTorch model
@@ -1013,7 +1013,7 @@ class Detections:
 
     def print(self):
         """Logs the string representation of the current object's state via the LOGGER."""
-        LOGGER.info(self.__str__())
+        #LOGGER.info(self.__str__())
 
     def __len__(self):
         """Returns the number of results stored, overrides the default len(results)."""
