@@ -6,6 +6,6 @@ My Model:ccpd_chose_100epoch.pt
 
 Still Improving
 
-可以调用IP摄像头实现实时检测
+设计了一个简单的UI界面喵:)
 
-试着将其封装成为安卓App以实现移动的检测和识别....
+大概就做这样了喵:)
